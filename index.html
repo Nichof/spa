@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <header>
+        <h1>SPA</h1>
+        <nav>
+            <ul>
+                <li><a href="#home" >Home</a></li>
+                <li><a href="#about_us" >About Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+<div class="loader" style="visibility:hidden"> Loading... </div>
+    <main>
+    
+    </main>
+
+    <footer>
+        A SPA Production &copy;
+    </footer>
+    <script>
+        window.onload = function () {
+            updateContent();
+            const list = document.querySelector('ul').children;
+            Array.prototype.forEach.call(list, (node) => {node.children[0].setAttribute('onclick','updateContent(this)')});
+        }
+
+        function updateContent(elem) {
+            let hashSign = window.location.hash;
+            if (elem !== undefined) {
+                hashSign = elem.attributes.href.nodeValue;
+            }
+            
+            switch (hashSign) {
+                case '':
+                    loadPage('#home');
+                    break;
+
+                default:
+                    loadPage(hashSign);
+                    break;
+            }
+        }
+
+        function loadPage(hex) {
+            const hexArray = [...hex];
+            hexArray.shift();
+            const hexString = hexArray.join('');
+            
+            const loaderElement = document.querySelector('.loader');
+            loaderElement.style.visibility = 'visible';
+
+            const xhrMain = new XMLHttpRequest;
+            xhrMain.open('GET', hexString + '.html');
+
+            xhrMain.onreadystatechange = function (e) {
+                if (xhrMain.readyState === 4 && xhrMain.status >= 200 && xhrMain.status < 400 ) {
+                    document.querySelector('main').innerHTML = xhrMain.responseText;
+                    loaderElement.style.visibility = 'hidden'; 
+                }
+            }
+
+            xhrMain.send();
+        }
+        
+    </script>
+</body>
+</html>
