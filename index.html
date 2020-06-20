@@ -9,7 +9,8 @@
             <ul>
                 <li><a href="#home" >Home</a></li>
                 <li><a href="#about_us" >About Us</a></li>
-            </ul>
+                <li><a href="#chuck_norris" >Chuck Norris API call</a></li>
+            </ul> 
         </nav>
     </header>
 
@@ -39,6 +40,9 @@
                     loadPage('#home');
                     break;
 
+                    case '#chuck_norris': 
+                    chuck();
+
                 default:
                     loadPage(hashSign);
                     break;
@@ -65,6 +69,24 @@
 
             xhrMain.send();
         }
+
+        function chuck() {
+            const loaderElement = document.querySelector('.loader');
+            loaderElement.style.visibility = 'visible';
+
+            const xhrArt= new XMLHttpRequest;
+            xhrArt.open('GET', 'https://api.chucknorris.io/jokes/random?category=science');
+
+            xhrArt.onreadystatechange = function (e) {
+                if (xhrArt.readyState === 4 && xhrArt.status >= 200 && xhrArt.status < 400 ) {
+                    const chuck = JSON.parse(xhrArt.responseText);
+                    const display = `<img src="${chuck.icon_url}"/> <p>${chuck.value  }</p>`;
+                    document.querySelector('main').innerHTML = display;
+                    loaderElement.style.visibility = 'hidden'; 
+                }
+            }
+            xhrArt.send();
+            }
         
     </script>
 </body>
