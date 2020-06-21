@@ -10,6 +10,7 @@
                 <li><a href="#home" >Home</a></li>
                 <li><a href="#about_us" >About Us</a></li>
                 <li><a href="#chuck_norris" >Chuck Norris API call</a></li>
+                <li><a href="#pokemon" >Pokemon API call</a></li>
             </ul> 
         </nav>
     </header>
@@ -25,6 +26,7 @@
     <script>
         window.onload = function () {
             updateContent();
+
             const list = document.querySelector('ul').children;
             Array.prototype.forEach.call(list, (node) => {node.children[0].setAttribute('onclick','updateContent(this)')});
         }
@@ -40,8 +42,13 @@
                     loadPage('#home');
                     break;
 
-                    case '#chuck_norris': 
+                case '#chuck_norris': 
                     chuck();
+                    break;
+
+                case '#pokemon':
+                    pokemon();
+                    break;
 
                 default:
                     loadPage(hashSign);
@@ -74,20 +81,61 @@
             const loaderElement = document.querySelector('.loader');
             loaderElement.style.visibility = 'visible';
 
-            const xhrArt= new XMLHttpRequest;
-            xhrArt.open('GET', 'https://api.chucknorris.io/jokes/random?category=science');
+            const xhrMain= new XMLHttpRequest;
+            xhrMain.open('GET', 'https://api.chucknorris.io/jokes/random?category=science');
 
-            xhrArt.onreadystatechange = function (e) {
-                if (xhrArt.readyState === 4 && xhrArt.status >= 200 && xhrArt.status < 400 ) {
-                    const chuck = JSON.parse(xhrArt.responseText);
-                    const display = `<img src="${chuck.icon_url}"/> <p>${chuck.value  }</p>`;
+            xhrMain.onreadystatechange = function (e) {
+                if (xhrMain.readyState === 4 && xhrMain.status >= 200 && xhrMain.status < 400 ) {
+                    const chuck = JSON.parse(xhrMain.responseText);
+                    const display = `<img src="${chuck.icon_url}"/> <p>${chuck.value}</p>`;
                     document.querySelector('main').innerHTML = display;
                     loaderElement.style.visibility = 'hidden'; 
                 }
             }
-            xhrArt.send();
+            xhrMain.send();
             }
-        
+
+        function pokemon(pokemonURL) {
+            if (pokemonURL === undefined ) {
+                pokemonURL = 'https://pokeapi.co/api/v2/pokemon/';
+            }
+
+            let pokemonUrlSubstr = pokemonURL.replace(/https:\/\/pokeapi.co\/api\/v2\/pokemon\//, '');
+            let pokemonUrlParamStr = pokemonUrlSubstr.replace(/\?/, "").split('&');
+            let pokemonUrlParamObj = {};
+            pokemonUrlParamStr.forEach( (val) => { const list = val.split('='); pokemonUrlParamObj[list[0]] = list[1]; } );
+
+            if (pokemonURL === 'https://pokeapi.co/api/v2/pokemon/') {
+                    pokemonUrlParamObj = { offset: '0', limit: '20' } ;
+                }
+               
+            const loaderElement = document.querySelector('.loader');
+            loaderElement.style.visibility = 'visible';
+
+            const xhrMain = new XMLHttpRequest;
+            xhrMain.open('GET', pokemonURL );
+
+            xhrMain.onreadystatechange = function (e) {
+                if (xhrMain.readyState === 4 && xhrMain.status >= 200 && xhrMain.status < 400 ) {
+                    const pokemonObject = JSON.parse(xhrMain.responseText);
+               
+                    const pokemonList = [];
+                    pokemonObject.results.forEach( (item, index) => {pokemonList.push(`<tr> <td>${index + 1 +  Number(pokemonUrlParamObj.offset)}</td><td> ${item.name} </td></tr>`)});
+                    let pokemonTable = '<table>' + pokemonList.join().replace(/,/g, '') + '</table>';
+                    if (pokemonUrlParamObj.offset === '0') { 
+                        pokemonTable += `[<a href="#" onclick="pokemon('${pokemonObject.next}')"> Next </a>]`;
+                    } else {
+                        let backOffset = (Number(pokemonUrlParamObj.offset) - Number(pokemonUrlParamObj.limit));
+                        pokemonTable += `[<a href="#" onclick="pokemon('https://pokeapi.co/api/v2/pokemon/?offset=${backOffset.toString()}&limit=${pokemonUrlParamObj.limit}')">Back</a>] [<a href="#" onclick="pokemon('${pokemonObject.next}')"> Next </a>]`;
+                    }
+
+                    document.querySelector('main').innerHTML = pokemonTable;
+                    loaderElement.style.visibility = 'hidden'; 
+                }
+            }
+
+        xhrMain.send();
+        }
     </script>
 </body>
 </html>
