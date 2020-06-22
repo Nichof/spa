@@ -118,15 +118,20 @@
             xhrMain.onreadystatechange = function (e) {
                 if (xhrMain.readyState === 4 && xhrMain.status >= 200 && xhrMain.status < 400 ) {
                     const pokemonObject = JSON.parse(xhrMain.responseText);
-               
+                    console.log(pokemonObject);
                     const pokemonList = [];
                     pokemonObject.results.forEach( (item, index) => {pokemonList.push(`<tr> <td>${index + 1 +  Number(pokemonUrlParamObj.offset)}</td><td> ${item.name} </td></tr>`)});
                     let pokemonTable = '<table>' + pokemonList.join().replace(/,/g, '') + '</table>';
                     if (pokemonUrlParamObj.offset === '0') { 
-                        pokemonTable += `[<a href="#" onclick="pokemon('${pokemonObject.next}')"> Next </a>]`;
+                        pokemonTable += `[ Back ] [ <a href="#" onclick="pokemon('${pokemonObject.next}')">Next</a> ]`;
+                    } else if (pokemonObject.next === null) {
+                        let backOffset = (Number(pokemonUrlParamObj.offset) - 20);
+                        let backLimit = 20;
+                        pokemonTable += `[ <a href="#" onclick="pokemon('https://pokeapi.co/api/v2/pokemon/?offset=${backOffset.toString()}&limit=${String(backLimit)}')">Back</a> ] [ Next ]`;
+
                     } else {
                         let backOffset = (Number(pokemonUrlParamObj.offset) - Number(pokemonUrlParamObj.limit));
-                        pokemonTable += `[<a href="#" onclick="pokemon('https://pokeapi.co/api/v2/pokemon/?offset=${backOffset.toString()}&limit=${pokemonUrlParamObj.limit}')">Back</a>] [<a href="#" onclick="pokemon('${pokemonObject.next}')"> Next </a>]`;
+                        pokemonTable += `[ <a href="#" onclick="pokemon('https://pokeapi.co/api/v2/pokemon/?offset=${backOffset.toString()}&limit=${pokemonUrlParamObj.limit}')">Back</a> ] [ <a href="#" onclick="pokemon('${pokemonObject.next}')">Next</a> ]`;
                     }
 
                     document.querySelector('main').innerHTML = pokemonTable;
