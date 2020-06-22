@@ -24,16 +24,18 @@
         A SPA Production &copy;
     </footer>
     <script>
+       
         window.onload = function () {
             updateContent();
 
             const list = document.querySelector('ul').children;
-            Array.prototype.forEach.call(list, (node) => {node.children[0].setAttribute('onclick','updateContent(this)')});
+            Array.prototype.forEach.call(list, (node) => {node.children[0].setAttribute('onclick','updateContent(null, this)')}); 
+            window.onhashchange = updateContent;
         }
 
-        function updateContent(elem) {
+        function updateContent(evt, elem) {
             let hashSign = window.location.hash;
-            if (elem !== undefined) {
+            if (elem !== undefined ) {
                 hashSign = elem.attributes.href.nodeValue;
             }
             
